@@ -54,17 +54,10 @@ namespace HangmanGame.ViewModels
         {
             if (SelectedUser == null) return;
 
-            string usernameToDelete = SelectedUser.Username; // Salvăm numele pentru a-i șterge salvările mai târziu
-
-            // 1. Ștergem din memorie și din fișierul de utilizatori (stergem asocierea)
+            string usernameToDelete = SelectedUser.Username; 
             Users.Remove(SelectedUser);
             SaveUsers();
 
-            // 2. TODO: Vom șterge fișierul de statistici al utilizatorului (ex: stats_nume.txt)
-            // 3. TODO: Vom șterge jocurile salvate ale utilizatorului (ex: save_nume.txt)
-
-            // Am eliminat File.Delete(image) ca să nu stricăm avatarele altor jucători
-            // sau lista de avatare predefinite.
         }
 
         private void OnPlay(object obj)

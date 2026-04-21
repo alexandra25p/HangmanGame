@@ -46,8 +46,15 @@
                 </Border>
                 <StackPanel VerticalAlignment="Center" Margin="15,0">
                     <TextBlock Text="{Binding CurrentPlayer.Username}" FontSize="24" FontWeight="Bold" Foreground="#4A306D"/>
-                    <TextBlock Text="Nivel: 0" FontSize="14" Foreground="Gray" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentPlayer.CurrentLevel, StringFormat='Nivel: {0}'}" FontSize="14"  Foreground="Gray" 
+           FontWeight="Bold"/>
                 </StackPanel>
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Text="Timp rămas: " FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
+                <TextBlock Text="{Binding TimeLeft}" FontSize="24" Foreground="Red" FontWeight="Bold"/>
+                <TextBlock Text=" secunde" FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
             </StackPanel>
 
             <Button Content="Cancel" Width="100" Height="35" HorizontalAlignment="Right" 

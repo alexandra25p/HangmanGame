@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Text.Json;
 
 namespace HangmanGame.ViewModels
 {
@@ -73,6 +74,8 @@ namespace HangmanGame.ViewModels
         public ICommand SaveGameCommand { get; }
         public ICommand StatisticsCommand { get; }
 
+        public ICommand LoadGameCommand { get; }
+
         public GameViewModel(UserModel player)
         {
             CurrentPlayer = player;
@@ -83,6 +86,7 @@ namespace HangmanGame.ViewModels
             AboutCommand = new RelayCommand(OnAbout);
             SaveGameCommand = new RelayCommand(OnSaveGame);
             StatisticsCommand = new RelayCommand(OnStatistics);
+            LoadGameCommand = new RelayCommand(OnLoadGame);
 
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
@@ -121,10 +125,7 @@ namespace HangmanGame.ViewModels
                 TimeLeft = 0;
                 _timer.Stop();
 
-                // Înregistrăm jocul jucat
                 CurrentPlayer.GamesPlayed++;
-
-                // RESETARE CONFORM CERINTEI: Pierdem seria si nivelul
                 CurrentPlayer.CurrentLevel = 0;
                 _consecutiveWins = 0;
 
@@ -302,8 +303,90 @@ namespace HangmanGame.ViewModels
 
         private void OnSaveGame(object obj)
         {
-            // Aici se va implementa serializarea profilului în fișier
-            MessageBox.Show("Jocul a fost salvat!", "Save");
+            // 1. Întrebăm utilizatorul cum să se numească salvarea
+            // Folosim o logică simplă: dacă nu avem o fereastră de input, 
+            // putem folosi numele categoriei și ora.
+            string customName = Microsoft.VisualBasic.Interaction.InputBox(
+                "Introdu un nume pentru această salvare:",
+                "Salvare Joc",
+                $"Salvare_{_currentCategory}");
+
+            if (string.IsNullOrEmpty(customName)) return; // Utilizatorul a dat Cancel
+
+            try
+            {
+                var save = new GameSave
+                {
+                    // Adăugăm username-ul în nume pentru a asigura cerința de "doar ale sale"
+                    SaveName = $"{CurrentPlayer.Username}_{customName}",
+                    PlayerUsername = CurrentPlayer.Username,
+                    Category = _currentCategory,
+                    WordToGuess = _wordToGuess,
+                    GuessedLetters = new List<char>(_guessedLetters),
+                    Mistakes = _mistakes,
+                    TimeLeft = TimeLeft,
+                    Level = CurrentPlayer.CurrentLevel,
+                    SaveDate = DateTime.Now
+                };
+
+                // Calea: Folderul Saves din interiorul proiectului
+                string directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
+                if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+                string filePath = Path.Combine(directory, $"{save.SaveName}.json");
+
+                string jsonString = JsonSerializer.Serialize(save, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(filePath, jsonString);
+
+                MessageBox.Show($"Jocul '{customName}' a fost salvat!", "Succes");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Eroare la salvare: {ex.Message}");
+            }
+        }
+
+        private void OnLoadGame(object obj)
+        {
+            // Deschidem fereastra de selecție și îi dăm numele userului curent
+            var loadWin = new LoadGameWindow(CurrentPlayer.Username);
+
+            if (loadWin.ShowDialog() == true)
+            {
+                var save = loadWin.SelectedSave;
+
+                _timer.Stop();
+
+                _currentCategory = save.Category;
+                _wordToGuess = save.WordToGuess;
+                _guessedLetters = save.GuessedLetters;
+                _mistakes = save.Mistakes;
+                TimeLeft = save.TimeLeft;
+                CurrentPlayer.CurrentLevel = save.Level;
+
+                CurrentHangmanImage = $"/Images/hg{_mistakes}.png";
+                UpdateDisplayedWord();
+
+                // Resetăm bifele de categorii (ca să apară corect în meniu)
+                UpdateCategoryChecks(_currentCategory);
+
+                _timer.Start();
+                MessageBox.Show("Joc încărcat!");
+            }
+        }
+        private void UpdateCategoryChecks(string category)
+        {
+            IsAllCategories = IsCars = IsMovies = IsRivers = IsCountries = IsFlowers = IsInstruments = false;
+            switch (category)
+            {
+                case "All categories": IsAllCategories = true; break;
+                case "Cars": IsCars = true; break;
+                case "Movies": IsMovies = true; break;
+                case "Rivers": IsRivers = true; break;
+                case "Countries": IsCountries = true; break;
+                case "Flowers": IsFlowers = true; break;
+                case "Instruments": IsInstruments = true; break;
+            }
         }
 
         private void OnStatistics(object obj)

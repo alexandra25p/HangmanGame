@@ -1,0 +1,2 @@
+Andrei|Images\leu.jpg
+Ale|Images\panda.png

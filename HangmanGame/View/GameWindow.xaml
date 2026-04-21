@@ -1,0 +1,137 @@
+﻿<Window x:Class="HangmanGame.View.GameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hangman - Joc" Height="700" Width="900" 
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F0FA"
+        KeyDown="Window_KeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" Background="#EADDF8" FontSize="14" Padding="5">
+            <MenuItem Header="_File">
+                <MenuItem Header="New Game" Command="{Binding NewGameCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save Game" Command="{Binding SaveGameCommand}"/>
+                <MenuItem Header="Statistics" Command="{Binding StatisticsCommand}"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="Cancel_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Categories">
+                <MenuItem Header="All categories" IsCheckable="True" IsChecked="{Binding IsAllCategories}" Command="{Binding CategoryCommand}" CommandParameter="All categories"/>
+                <MenuItem Header="Cars" IsCheckable="True" IsChecked="{Binding IsCars}" Command="{Binding CategoryCommand}" CommandParameter="Cars"/>
+                <MenuItem Header="Movies" IsCheckable="True" IsChecked="{Binding IsMovies}" Command="{Binding CategoryCommand}" CommandParameter="Movies"/>
+                <MenuItem Header="Rivers" IsCheckable="True" IsChecked="{Binding IsRivers}" Command="{Binding CategoryCommand}" CommandParameter="Rivers"/>
+                <MenuItem Header="Countries" IsCheckable="True" IsChecked="{Binding IsCountries}" Command="{Binding CategoryCommand}" CommandParameter="Countries"/>
+                <MenuItem Header="Flowers" IsCheckable="True" IsChecked="{Binding IsFlowers}" Command="{Binding CategoryCommand}" CommandParameter="Flowers"/>
+                <MenuItem Header="Instruments" IsCheckable="True" IsChecked="{Binding IsInstruments}" Command="{Binding CategoryCommand}" CommandParameter="Instruments"/>
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem Header="About" Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" Margin="20,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Border BorderBrush="#D4C4F0" BorderThickness="2" CornerRadius="8" Background="White">
+                    <Image Source="{Binding CurrentPlayer.FullImagePath}" Width="60" Height="60" Stretch="Uniform" Margin="2"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center" Margin="15,0">
+                    <TextBlock Text="{Binding CurrentPlayer.Username}" FontSize="24" FontWeight="Bold" Foreground="#4A306D"/>
+                    <TextBlock Text="Nivel: 0" FontSize="14" Foreground="Gray" FontWeight="Bold"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Content="Cancel" Width="100" Height="35" HorizontalAlignment="Right" 
+                    Background="#EADDF8" Foreground="#4A306D" FontWeight="Bold" Click="Cancel_Click"/>
+        </Grid>
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Image x:Name="HangmanImage" Height="200" Margin="0,0,0,30" Source="{Binding CurrentHangmanImage}" />
+
+            <TextBlock Text="{Binding DisplayedWord}" 
+                       FontSize="48" 
+                       FontWeight="Bold" 
+                       Foreground="#4A306D" 
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <Border Grid.Row="3" Background="#EADDF8" CornerRadius="20,20,0,0" Padding="20">
+            <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="800">
+                <WrapPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Width" Value="45"/>
+                        <Setter Property="Height" Value="45"/>
+                        <Setter Property="Margin" Value="4"/>
+                        <Setter Property="FontSize" Value="18"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="White"/>
+                        <Setter Property="Foreground" Value="#4A306D"/>
+                        <Setter Property="BorderBrush" Value="#D4C4F0"/>
+                        <Setter Property="BorderThickness" Value="2"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="BtnBorder" 
+                                            Background="{TemplateBinding Background}" 
+                                            BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                            CornerRadius="8">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="BtnBorder" Property="Background" Value="#D3D3D3"/>
+                                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="#A9A9A9"/>
+                                            <Setter Property="Foreground" Value="#808080"/>
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="BtnBorder" Property="Background" Value="#F4F0FA"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </WrapPanel.Resources>
+
+                <Button Content="A" Command="{Binding GuessCommand}" CommandParameter="A"/>
+                <Button Content="B" Command="{Binding GuessCommand}" CommandParameter="B"/>
+                <Button Content="C" Command="{Binding GuessCommand}" CommandParameter="C"/>
+                <Button Content="D" Command="{Binding GuessCommand}" CommandParameter="D"/>
+                <Button Content="E" Command="{Binding GuessCommand}" CommandParameter="E"/>
+                <Button Content="F" Command="{Binding GuessCommand}" CommandParameter="F"/>
+                <Button Content="G" Command="{Binding GuessCommand}" CommandParameter="G"/>
+                <Button Content="H" Command="{Binding GuessCommand}" CommandParameter="H"/>
+                <Button Content="I" Command="{Binding GuessCommand}" CommandParameter="I"/>
+                <Button Content="J" Command="{Binding GuessCommand}" CommandParameter="J"/>
+                <Button Content="K" Command="{Binding GuessCommand}" CommandParameter="K"/>
+                <Button Content="L" Command="{Binding GuessCommand}" CommandParameter="L"/>
+                <Button Content="M" Command="{Binding GuessCommand}" CommandParameter="M"/>
+                <Button Content="N" Command="{Binding GuessCommand}" CommandParameter="N"/>
+                <Button Content="O" Command="{Binding GuessCommand}" CommandParameter="O"/>
+                <Button Content="P" Command="{Binding GuessCommand}" CommandParameter="P"/>
+                <Button Content="Q" Command="{Binding GuessCommand}" CommandParameter="Q"/>
+                <Button Content="R" Command="{Binding GuessCommand}" CommandParameter="R"/>
+                <Button Content="S" Command="{Binding GuessCommand}" CommandParameter="S"/>
+                <Button Content="T" Command="{Binding GuessCommand}" CommandParameter="T"/>
+                <Button Content="U" Command="{Binding GuessCommand}" CommandParameter="U"/>
+                <Button Content="V" Command="{Binding GuessCommand}" CommandParameter="V"/>
+                <Button Content="W" Command="{Binding GuessCommand}" CommandParameter="W"/>
+                <Button Content="X" Command="{Binding GuessCommand}" CommandParameter="X"/>
+                <Button Content="Y" Command="{Binding GuessCommand}" CommandParameter="Y"/>
+                <Button Content="Z" Command="{Binding GuessCommand}" CommandParameter="Z"/>
+            </WrapPanel>
+        </Border>
+    </Grid>
+</Window>

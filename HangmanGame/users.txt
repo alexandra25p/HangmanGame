@@ -1,2 +1,3 @@
-Andrei|Images\leu.jpg
 Ale|Images\panda.png
+Andrei|Images\dog.png
+Guest|Images\lamb.jpg

@@ -12,11 +12,14 @@ namespace HangmanGame.View
             InitializeComponent();
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.StopTimer();
+            }
             this.Close();
         }
-
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -31,6 +34,13 @@ namespace HangmanGame.View
                         vm.GuessCommand.Execute(pressedLetter);
                     }
                 }
+            }
+        }
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (this.DataContext is GameViewModel vm)
+            {
+                vm.StopTimer(); 
             }
         }
     }

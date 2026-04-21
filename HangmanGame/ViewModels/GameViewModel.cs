@@ -15,6 +15,7 @@ namespace HangmanGame.ViewModels
     {
         private UserModel _currentPlayer;
         private const string WordsFile = "words.txt";
+        private const string UsersFile = "users.txt";
         private Dictionary<string, List<string>> _wordsByCategory;
         private List<string> _usedWords = new List<string>();
         private string _currentCategory = "All categories";
@@ -46,6 +47,11 @@ namespace HangmanGame.ViewModels
             set { _displayedWord = value; OnPropertyChanged(); }
         }
 
+        public string CurrentCategory
+        {
+            get => _currentCategory;
+            set { _currentCategory = value; OnPropertyChanged(); }
+        }
         public int TimeLeft
         {
             get => _timeLeft;
@@ -73,7 +79,6 @@ namespace HangmanGame.ViewModels
         public ICommand AboutCommand { get; }
         public ICommand SaveGameCommand { get; }
         public ICommand StatisticsCommand { get; }
-
         public ICommand LoadGameCommand { get; }
 
         public GameViewModel(UserModel player)
@@ -96,6 +101,75 @@ namespace HangmanGame.ViewModels
             StartNewGame(null);
         }
 
+        private List<UserModel> GetAllUsers()
+        {
+            var users = new List<UserModel>();
+            if (!File.Exists(UsersFile)) return users;
+
+            var lines = File.ReadAllLines(UsersFile);
+            foreach (var line in lines)
+            {
+                var parts = line.Split('|');
+                if (parts.Length >= 2)
+                {
+                    var user = new UserModel
+                    {
+                        Username = parts[0],
+                        ImagePath = parts[1],
+                        CurrentLevel = (parts.Length >= 3) ? int.Parse(parts[2]) : 0
+                    };
+
+                    if (parts.Length >= 4 && !string.IsNullOrEmpty(parts[3]))
+                    {
+                        var categories = parts[3].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var catData in categories)
+                        {
+                            var details = catData.Split(':');
+                            if (details.Length == 2)
+                            { 
+                                var scores = details[1].Split(',');
+                                if (scores.Length == 2)
+                                {
+                                    user.CategoryStats[details[0]] = new CategoryStats
+                                    {
+                                        Played = int.Parse(scores[0]),
+                                        Won = int.Parse(scores[1])
+                                    };
+                                }
+                            }
+                        }
+                    }
+
+                    users.Add(user);
+                }
+            }
+            return users;
+        }
+
+        private void UpdateUserStatsInFile(bool isWin)
+        {
+            var allUsers = GetAllUsers();
+            var currentUser = allUsers.FirstOrDefault(u => u.Username == CurrentPlayer.Username);
+
+            if (currentUser != null)
+            {
+                if (!currentUser.CategoryStats.ContainsKey(_currentCategory))
+                    currentUser.CategoryStats[_currentCategory] = new CategoryStats();
+
+                currentUser.CategoryStats[_currentCategory].Played++;
+                if (isWin) currentUser.CategoryStats[_currentCategory].Won++;
+
+                currentUser.CurrentLevel = CurrentPlayer.CurrentLevel;
+
+                var lines = allUsers.Select(u => {
+                    string statsStr = string.Join(";", u.CategoryStats.Select(kvp => $"{kvp.Key}:{kvp.Value.Played},{kvp.Value.Won}"));
+                    return $"{u.Username}|{u.ImagePath}|{u.CurrentLevel}|{statsStr}";
+                });
+
+                File.WriteAllLines(UsersFile, lines);
+            }
+        }
+
         private void LoadWords()
         {
             _wordsByCategory = new Dictionary<string, List<string>>();
@@ -114,38 +188,12 @@ namespace HangmanGame.ViewModels
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            if (TimeLeft > 1)
-            {
-                TimeLeft--;
-            }
-            else
-            {
-                TimeLeft = 0;
-                _timer.Stop();
-
-                CurrentPlayer.GamesPlayed++;
-                CurrentPlayer.CurrentLevel = 0;
-                _consecutiveWins = 0;
-
-                string revealedWord = _wordToGuess;
-                _wordToGuess = "";
-                CommandManager.InvalidateRequerySuggested();
-
-                MessageBox.Show($"Timpul a expirat! Nivelul a fost resetat la 0.\nCuvântul era: {revealedWord}", "Game Over");
-                StartNewGame(null);
-            }
-        }
-
         private void ChangeCategory(object parameter)
         {
             if (parameter is string category)
             {
-                _currentCategory = category;
+                CurrentCategory = category; 
                 IsAllCategories = IsCars = IsMovies = IsRivers = IsCountries = IsFlowers = IsInstruments = false;
-
-                // Resetare nivel la schimbarea categoriei
                 CurrentPlayer.CurrentLevel = 0;
                 _consecutiveWins = 0;
 
@@ -166,11 +214,12 @@ namespace HangmanGame.ViewModels
 
         private void StartNewGame(object obj)
         {
+           
+            _timer.Stop(); 
             _mistakes = 0;
             _guessedLetters = new List<char>();
             CurrentHangmanImage = "/Images/hg0.png";
             TimeLeft = 30;
-            _timer.Start();
 
             List<string> wordPool = new List<string>();
             if (_currentCategory == "All categories")
@@ -195,13 +244,14 @@ namespace HangmanGame.ViewModels
                 _usedWords.Add(_wordToGuess);
                 UpdateDisplayedWord();
             }
+
+            _timer.Start();
             CommandManager.InvalidateRequerySuggested();
         }
 
         private void GuessLetter(object parameter)
         {
             if (string.IsNullOrEmpty(_wordToGuess)) return;
-
             if (parameter is string letterStr && letterStr.Length == 1)
             {
                 char letter = letterStr[0];
@@ -242,25 +292,22 @@ namespace HangmanGame.ViewModels
             if (!DisplayedWord.Contains('_'))
             {
                 _timer.Stop();
-
-                // Actualizăm statistica globală (nu se resetează niciodată)
-                CurrentPlayer.GamesWon++;
-                CurrentPlayer.GamesPlayed++;
-
-                _consecutiveWins++;
-
-                // Creștem nivelul la fiecare 3 victorii consecutive
-                if (_consecutiveWins > 0 && _consecutiveWins % 3 == 0)
+                _consecutiveWins++; 
+                if (_consecutiveWins >= 3)
                 {
                     CurrentPlayer.CurrentLevel++;
-                    MessageBox.Show($"Nivel Nou! Esti la nivelul {CurrentPlayer.CurrentLevel}!", "Level Up");
+                    UpdateUserStatsInFile(true); 
+
+                    _consecutiveWins = 0; 
+                    MessageBox.Show($"FELICITĂRI! Ai ghicit 3 cuvinte la rând. Ai urcat la Nivelul {CurrentPlayer.CurrentLevel}!", "Joc Câștigat");
                 }
                 else
                 {
-                    MessageBox.Show($"Cuvânt ghicit! Seria curentă: {_consecutiveWins % 3}/3 victorii.", "Bravo");
+                  
+                    MessageBox.Show($"Cuvânt ghicit! Seria ta: {_consecutiveWins}/3. Încă puțin!", "Bravo");
                 }
 
-                StartNewGame(null);
+                StartNewGame(null); 
             }
         }
 
@@ -270,25 +317,56 @@ namespace HangmanGame.ViewModels
             {
                 _timer.Stop();
 
-                // Înregistrăm jocul în statistici
-                CurrentPlayer.GamesPlayed++;
+                UpdateUserStatsInFile(false); 
 
-                // RESETARE CONFORM CERINTEI: Pierdem seria si nivelul la greseala fatală
-                CurrentPlayer.CurrentLevel = 0;
-                _consecutiveWins = 0;
+                _consecutiveWins = 0; 
+                CurrentPlayer.CurrentLevel = 0; 
 
                 string revealed = _wordToGuess;
                 _wordToGuess = "";
                 CommandManager.InvalidateRequerySuggested();
 
-                MessageBox.Show($"Ai pierdut! Nivelul a fost resetat la 0.\nCuvântul era: {revealed}", "Game Over");
+                MessageBox.Show($"Ai pierdut! Seria a fost întreruptă. Cuvântul era: {revealed}", "Game Over");
                 StartNewGame(null);
+            }
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_wordToGuess))
+            {
+                _timer.Stop();
+                return;
+            }
+
+            if (TimeLeft > 0)
+            {
+                TimeLeft--;
+            }
+            else 
+            {
+                _timer.Stop();
+
+                string cuvantDeAfisat = _wordToGuess;
+                UpdateUserStatsInFile(false);
+                _consecutiveWins = 0;
+                CurrentPlayer.CurrentLevel = 0;
+
+                MessageBox.Show($"Timpul a expirat! Joc pierdut. Cuvântul era: {cuvantDeAfisat}", "Game Over");
+
+                StartNewGame(null);
+            }
+        }
+        public void StopTimer()
+        {
+            if (_timer != null)
+            {
+                _timer.Stop();
             }
         }
 
         private void ResetToZeroAndStart(object obj)
         {
-            // Resetare manuală din butonul "New Game"
             CurrentPlayer.CurrentLevel = 0;
             _consecutiveWins = 0;
             _usedWords.Clear();
@@ -297,27 +375,18 @@ namespace HangmanGame.ViewModels
 
         private void OnAbout(object obj)
         {
-            AboutWindow aboutWin = new AboutWindow();
-            aboutWin.ShowDialog();
+            new AboutWindow().ShowDialog();
         }
 
         private void OnSaveGame(object obj)
         {
-            // 1. Întrebăm utilizatorul cum să se numească salvarea
-            // Folosim o logică simplă: dacă nu avem o fereastră de input, 
-            // putem folosi numele categoriei și ora.
-            string customName = Microsoft.VisualBasic.Interaction.InputBox(
-                "Introdu un nume pentru această salvare:",
-                "Salvare Joc",
-                $"Salvare_{_currentCategory}");
-
-            if (string.IsNullOrEmpty(customName)) return; // Utilizatorul a dat Cancel
+            string customName = Microsoft.VisualBasic.Interaction.InputBox("Nume salvare:", "Salvare Joc", $"Salvare_{_currentCategory}");
+            if (string.IsNullOrEmpty(customName)) return;
 
             try
             {
                 var save = new GameSave
                 {
-                    // Adăugăm username-ul în nume pentru a asigura cerința de "doar ale sale"
                     SaveName = $"{CurrentPlayer.Username}_{customName}",
                     PlayerUsername = CurrentPlayer.Username,
                     Category = _currentCategory,
@@ -328,34 +397,21 @@ namespace HangmanGame.ViewModels
                     Level = CurrentPlayer.CurrentLevel,
                     SaveDate = DateTime.Now
                 };
-
-                // Calea: Folderul Saves din interiorul proiectului
                 string directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
                 if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-
-                string filePath = Path.Combine(directory, $"{save.SaveName}.json");
-
-                string jsonString = JsonSerializer.Serialize(save, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(filePath, jsonString);
-
-                MessageBox.Show($"Jocul '{customName}' a fost salvat!", "Succes");
+                File.WriteAllText(Path.Combine(directory, $"{save.SaveName}.json"), JsonSerializer.Serialize(save, new JsonSerializerOptions { WriteIndented = true }));
+                MessageBox.Show("Joc salvat!");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Eroare la salvare: {ex.Message}");
-            }
+            catch (Exception ex) { MessageBox.Show($"Eroare: {ex.Message}"); }
         }
 
         private void OnLoadGame(object obj)
         {
-            // Deschidem fereastra de selecție și îi dăm numele userului curent
+            _timer.Stop();
             var loadWin = new LoadGameWindow(CurrentPlayer.Username);
-
             if (loadWin.ShowDialog() == true)
             {
                 var save = loadWin.SelectedSave;
-
-                _timer.Stop();
 
                 _currentCategory = save.Category;
                 _wordToGuess = save.WordToGuess;
@@ -366,35 +422,34 @@ namespace HangmanGame.ViewModels
 
                 CurrentHangmanImage = $"/Images/hg{_mistakes}.png";
                 UpdateDisplayedWord();
-
-                // Resetăm bifele de categorii (ca să apară corect în meniu)
                 UpdateCategoryChecks(_currentCategory);
 
                 _timer.Start();
-                MessageBox.Show("Joc încărcat!");
+                MessageBox.Show("Joc încărcat cu succes!");
             }
+            else
+                _timer.Start();
+
         }
+
         private void UpdateCategoryChecks(string category)
         {
             IsAllCategories = IsCars = IsMovies = IsRivers = IsCountries = IsFlowers = IsInstruments = false;
-            switch (category)
-            {
-                case "All categories": IsAllCategories = true; break;
-                case "Cars": IsCars = true; break;
-                case "Movies": IsMovies = true; break;
-                case "Rivers": IsRivers = true; break;
-                case "Countries": IsCountries = true; break;
-                case "Flowers": IsFlowers = true; break;
-                case "Instruments": IsInstruments = true; break;
-            }
+            if (category == "All categories") IsAllCategories = true;
+            else if (category == "Cars") IsCars = true;
+            else if (category == "Movies") IsMovies = true;
+            else if (category == "Rivers") IsRivers = true;
+            else if (category == "Countries") IsCountries = true;
+            else if (category == "Flowers") IsFlowers = true;
+            else if (category == "Instruments") IsInstruments = true;
         }
 
         private void OnStatistics(object obj)
         {
-            // Aici se va deschide fereastra de statistici
-            MessageBox.Show($"Statistici pentru {CurrentPlayer.Username}:\n" +
-                            $"- Victorii totale: {CurrentPlayer.GamesWon}\n" +
-                            $"- Jocuri jucate: {CurrentPlayer.GamesPlayed}", "Statistici");
+            var allUsers = GetAllUsers();
+            StatisticsWindow statsWin = new StatisticsWindow(allUsers, CurrentPlayer.Username);
+
+            statsWin.ShowDialog();
         }
     }
 }

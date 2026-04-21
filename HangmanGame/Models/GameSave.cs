@@ -14,6 +14,7 @@ namespace HangmanGame.Models
         public int Mistakes { get; set; }
         public int TimeLeft { get; set; }
         public int Level { get; set; }
+        public int ConsecutiveWins { get; set; }
         public DateTime SaveDate { get; set; }
     }
 }

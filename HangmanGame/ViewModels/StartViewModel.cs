@@ -54,10 +54,36 @@ namespace HangmanGame.ViewModels
         {
             if (SelectedUser == null) return;
 
-            string usernameToDelete = SelectedUser.Username; 
-            Users.Remove(SelectedUser);
-            SaveUsers();
+            var result = MessageBox.Show($"Sigur vrei să ștergi utilizatorul {SelectedUser.Username}? Toate statisticile și jocurile salvate vor fi pierdute.",
+                                         "Confirmare Ștergere", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
+            if (result == MessageBoxResult.Yes)
+            {
+                string usernameToDelete = SelectedUser.Username;
+
+                try
+                {
+                    string savesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
+
+                    if (Directory.Exists(savesPath))
+                    {
+                        var files = Directory.GetFiles(savesPath, $"{usernameToDelete}_*.json");
+                        foreach (var file in files)
+                        {
+                            File.Delete(file);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"A apărut o problemă la ștergerea jocurilor salvate: {ex.Message}");
+                }
+
+                Users.Remove(SelectedUser);
+                SaveUsers();
+
+                MessageBox.Show("Utilizator șters cu succes!");
+            }
         }
 
         private void OnPlay(object obj)
@@ -83,22 +109,73 @@ namespace HangmanGame.ViewModels
 
         private void SaveUsers()
         {
-            var lines = Users.Select(u => $"{u.Username}|{u.ImagePath}");
+            var lines = Users.Select(u => {
+                string statsStr = string.Join(";", u.CategoryStats.Select(kvp => $"{kvp.Key}:{kvp.Value.Played},{kvp.Value.Won}"));
+
+                return $"{u.Username}|{u.ImagePath}|{u.CurrentLevel}|{statsStr}";
+            });
+
             File.WriteAllLines(UsersFile, lines);
         }
 
         private void LoadUsers()
         {
+            Users.Clear();
             if (!File.Exists(UsersFile)) return;
 
-            var lines = File.ReadAllLines(UsersFile);
-            foreach (var line in lines)
+            try
             {
-                var parts = line.Split('|');
-                if (parts.Length == 2)
+                var lines = File.ReadAllLines(UsersFile);
+                foreach (var line in lines)
                 {
-                    Users.Add(new UserModel { Username = parts[0], ImagePath = parts[1] });
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    var parts = line.Split('|');
+                    if (parts.Length >= 2)
+                    {
+                        var user = new UserModel
+                        {
+                            Username = parts[0],
+                            ImagePath = parts[1],
+                            CurrentLevel = 0,
+                            CategoryStats = new System.Collections.Generic.Dictionary<string, CategoryStats>()
+                        };
+
+                        if (parts.Length >= 3 && int.TryParse(parts[2], out int level))
+                        {
+                            user.CurrentLevel = level;
+                        }
+
+                        if (parts.Length >= 4 && !string.IsNullOrWhiteSpace(parts[3]))
+                        {
+                            var categories = parts[3].Split(';'); 
+                            foreach (var catEntry in categories)
+                            {
+                                var catParts = catEntry.Split(':'); 
+                                if (catParts.Length == 2)
+                                {
+                                    string catName = catParts[0];
+                                    var scores = catParts[1].Split(','); 
+
+                                    if (scores.Length == 2 &&
+                                        int.TryParse(scores[0], out int played) &&
+                                        int.TryParse(scores[1], out int won))
+                                    {
+                                         
+                                            user.CategoryStats[catName] = new CategoryStats { Played = played, Won = won };
+                                       
+                                    }
+                                }
+                            }
+                        }
+
+                        Users.Add(user);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Eroare critică la încărcarea utilizatorilor: {ex.Message}", "Eroare Fișier");
             }
         }
     }

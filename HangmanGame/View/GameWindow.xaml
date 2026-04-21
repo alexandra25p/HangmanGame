@@ -4,7 +4,8 @@
         Title="Hangman - Joc" Height="700" Width="900" 
         WindowStartupLocation="CenterScreen"
         Background="#F4F0FA"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        Closed="Window_Closed">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,7 +23,7 @@
                 <MenuItem Header="Save Game" Command="{Binding SaveGameCommand}"/>
                 <MenuItem Header="Statistics" Command="{Binding StatisticsCommand}"/>
                 <Separator/>
-                <MenuItem Header="Exit" Click="Cancel_Click"/>
+                <MenuItem Header="Exit" Click="CancelButton_Click"/>
             </MenuItem>
 
             <MenuItem Header="_Categories">
@@ -49,6 +50,7 @@
                     <TextBlock Text="{Binding CurrentPlayer.Username}" FontSize="24" FontWeight="Bold" Foreground="#4A306D"/>
                     <TextBlock Text="{Binding CurrentPlayer.CurrentLevel, StringFormat='Nivel: {0}'}" FontSize="14"  Foreground="Gray" 
            FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentCategory, StringFormat='Categorie: {0}'}" FontSize="14" Foreground="Gray" FontWeight="Bold"/>
                 </StackPanel>
             </StackPanel>
 
@@ -59,7 +61,7 @@
             </StackPanel>
 
             <Button Content="Cancel" Width="100" Height="35" HorizontalAlignment="Right" 
-                    Background="#EADDF8" Foreground="#4A306D" FontWeight="Bold" Click="Cancel_Click"/>
+                    Background="#EADDF8" Foreground="#4A306D" FontWeight="Bold" Click="CancelButton_Click"/>
         </Grid>
 
         <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">

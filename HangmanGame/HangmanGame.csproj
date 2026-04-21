@@ -32,6 +32,7 @@
     <None Remove="Images\panda.png" />
     <None Remove="Images\rabbit.jpg" />
     <None Remove="Images\shark.png" />
+    <None Remove="users.txt" />
     <None Remove="words.txt" />
   </ItemGroup>
 
@@ -82,6 +83,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\shark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="users.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="words.txt">

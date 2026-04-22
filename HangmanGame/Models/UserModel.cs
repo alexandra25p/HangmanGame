@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Media.Imaging;
 using HangmanGame.ViewModels;
 
 namespace HangmanGame.Models
@@ -25,10 +26,35 @@ namespace HangmanGame.Models
         public string ImagePath
         {
             get => _imagePath;
-            set { _imagePath = value; OnPropertyChanged(); OnPropertyChanged(nameof(FullImagePath)); }
+            set
+            {
+                _imagePath = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FullImagePath));
+            }
         }
 
-        public string FullImagePath => string.IsNullOrEmpty(ImagePath) ? null : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ImagePath);
+        public BitmapImage FullImagePath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ImagePath)) return null;
+
+                try
+                {
+                    var bi = new BitmapImage();
+                    bi.BeginInit();
+                    bi.UriSource = new Uri(Path.GetFullPath(ImagePath.TrimStart('/')));
+                    bi.CacheOption = BitmapCacheOption.OnLoad;
+                    bi.EndInit();
+                    return bi;
+                }
+                catch
+                {
+                    return null; 
+                }
+            }
+        }
 
         private int _currentLevel = 0;
         public int CurrentLevel

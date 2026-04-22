@@ -79,8 +79,8 @@
                      DisplayMemberPath="Username"
                      Margin="0,0,15,0" FontSize="18"/>
 
-            <Border Grid.Column="1" Margin="15,0,0,0" BorderBrush="#D4C4F0" BorderThickness="3" CornerRadius="15" Background="White">
-                <Image Source="{Binding SelectedUser.FullImagePath}" Stretch="Uniform" Margin="10">
+            <Border Grid.Column="1" Margin="20,0,0,0" BorderBrush="#D4C4F0" BorderThickness="3" CornerRadius="15" Background="White" Height="276" VerticalAlignment="Top">
+                <Image Source="{Binding SelectedUser.FullImagePath}" Stretch="Uniform" Margin="5">
                     <Image.Style>
                         <Style TargetType="Image">
                             <Style.Triggers>

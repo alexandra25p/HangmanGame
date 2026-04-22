@@ -59,7 +59,12 @@ namespace HangmanGame.ViewModels
 
             if (result == MessageBoxResult.Yes)
             {
-                string usernameToDelete = SelectedUser.Username;
+                var userToDelete = SelectedUser;
+                string usernameToDelete = userToDelete.Username;
+                string imagePathToDelete = userToDelete.ImagePath;
+
+                //eliberam resursa img din ui
+                SelectedUser = null;
 
                 try
                 {
@@ -79,7 +84,23 @@ namespace HangmanGame.ViewModels
                     MessageBox.Show($"An error occurred while deleting saved games: {ex.Message}");
                 }
 
-                Users.Remove(SelectedUser);
+                try
+                {
+                    if (!string.IsNullOrEmpty(imagePathToDelete) && !imagePathToDelete.StartsWith("/Images/Avatars/"))
+                    {
+                        string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, imagePathToDelete.TrimStart('/'));
+                        if (File.Exists(fullPath))
+                        {
+                            File.Delete(fullPath);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred while deleting the user image: {ex.Message}");
+                }
+
+                Users.Remove(userToDelete);
                 SaveUsers();
 
                 MessageBox.Show("User deleted successfully!");

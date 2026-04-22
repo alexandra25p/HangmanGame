@@ -281,7 +281,16 @@ namespace HangmanGame.ViewModels
         private void UpdateDisplayedWord()
         {
             if (string.IsNullOrEmpty(_wordToGuess)) return;
-            var display = _wordToGuess.Select(c => _guessedLetters.Contains(c) ? c : '_');
+
+            var display = _wordToGuess.Select(c =>
+            {
+                if (c == ' ')
+                {
+                    return ' ';
+                }
+                return _guessedLetters.Contains(c) ? c : '_';
+            });
+
             DisplayedWord = string.Join(" ", display);
         }
 
@@ -295,10 +304,16 @@ namespace HangmanGame.ViewModels
                 if (CurrentPlayer.CurrentLevel >= 3)
                 {
                     UpdateUserStatsInFile(true);
+                    MessageBox.Show($"Congratulations! You guessed 3 words and won the game!", "Game Won");
                     CurrentPlayer.CurrentLevel = 0;
-                    MessageBox.Show($"Congratulation! You guessed 3 words", "Game Won");
                 }
-                StartNewGame(null);
+                else
+                {
+                    int wordsLeft = 3 - CurrentPlayer.CurrentLevel;
+                    MessageBox.Show($"Word guessed! You need to guess {wordsLeft} more word(s) to win.", "Correct!");
+                }
+
+                StartNewGame(null); 
             }
         }
 

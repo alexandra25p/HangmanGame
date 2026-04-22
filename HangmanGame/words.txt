@@ -3,28 +3,65 @@ Cars|DACIA
 Cars|FERRARI
 Cars|PORSCHE
 Cars|CHEVROLET
-Movies|INCEPTION
+Cars|FORD
+Cars|AUDI
+Cars|BMW
+Cars|KIA
+Cars|ASTON MARTIN
+Cars|ALFA ROMEO
+Cars|LAMBORGHINI
+Cars|MERCEDES
+Cars|RENAULT
+Cars|TOYOTA
+Cars|HONDA
+Cars|NISSAN
+Cars|MAZDA
 Movies|AVATAR
 Movies|GLADIATOR
 Movies|TITANIC
-Movies|INTERSTELLAR
+Movies|AFTER
+Movies|TWILIGHT
+Movies|BARBIE
+Movies|SPIDER MAN
+Movies|HARRY POTTER
+Movies|STAR WARS
+Movies|LORD OF THE RINGS
 Rivers|AMAZON
 Rivers|DANUBE
 Rivers|NILE
-Rivers|THAMES
+Rivers|YANGTZE
+Rivers|SEINE
+Rivers|GANGES
 Rivers|MISSISSIPPI
 Countries|ROMANIA
 Countries|JAPAN
 Countries|CANADA
 Countries|BRAZIL
 Countries|AUSTRALIA
+Countries|INDIA
+Countries|SPAIN
+Countries|FRANCE
+Countries|ITALY
+Countries|GERMANY
+Countries|MEXICO
 Flowers|ROSE
 Flowers|TULIP
 Flowers|ORCHID
 Flowers|SUNFLOWER
 Flowers|LILY
+Flowers|DAISY
+Flowers|PEONY
+Flowers|IRIS
+Flowers|LAVENDER
+Flowers|JASMINE
 Instruments|PIANO
 Instruments|GUITAR
 Instruments|VIOLIN
 Instruments|FLUTE
 Instruments|DRUMS
+Instruments|SAXOPHONE
+Instruments|TRUMPET
+Instruments|HARMONICA
+Instruments|CLARINET
+Instruments|CELLO
+Instruments|BASS

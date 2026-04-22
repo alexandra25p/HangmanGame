@@ -23,7 +23,9 @@ namespace HangmanGame.View
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key >= Key.A && e.Key <= Key.Z)
+            bool isModifierPressed = (Keyboard.Modifiers != ModifierKeys.None);
+
+            if (!isModifierPressed && e.Key >= Key.A && e.Key <= Key.Z)
             {
                 string pressedLetter = e.Key.ToString();
 

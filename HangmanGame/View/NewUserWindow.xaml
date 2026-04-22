@@ -48,10 +48,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Username (un singur cuvant):" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBlock Text="Username (one word):" FontWeight="Bold" Margin="0,0,0,5"/>
         <TextBox x:Name="TxtName" Grid.Row="1" Margin="0,0,0,15" Padding="5" Height="30" VerticalContentAlignment="Center"/>
 
-        <TextBlock Grid.Row="2" Text="1. Alege un avatar predefinit:" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBlock Grid.Row="2" Text="1. Choose a predefined avatar" FontWeight="Bold" Margin="0,0,0,5"/>
 
         <ListBox x:Name="LstPredefined" Grid.Row="3" SelectionChanged="LstPredefined_SelectionChanged" 
                  Margin="0,0,0,15" Background="Transparent" BorderThickness="0" 
@@ -73,15 +73,15 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <TextBlock Grid.Row="4" Text="2. Sau alege o imagine de pe PC:" FontWeight="Bold" Margin="0,0,0,5"/>
-        <Button x:Name="BtnBrowse" Grid.Row="5" Content="Răsfoiește (Browse...)" Click="BtnBrowse_Click" Margin="0,0,0,10"/>
+        <TextBlock Grid.Row="4" Text="2. Or choose an image from your PC:" FontWeight="Bold" Margin="0,0,0,5"/>
+        <Button x:Name="BtnBrowse" Grid.Row="5" Content="Browse..." Click="BtnBrowse_Click" Margin="0,0,0,10"/>
 
         <Grid Grid.Row="6" Margin="0,5,0,0">
-            <TextBlock x:Name="TxtPath" Text="Nicio imagine selectată" FontStyle="Italic" Foreground="#85739C" TextWrapping="Wrap" Margin="0,0,175,0" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TxtPath" Text="No selected image" FontStyle="Italic" Foreground="#85739C" TextWrapping="Wrap" Margin="0,0,175,0" VerticalAlignment="Center"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Button Content="Salvează" Click="BtnSave_Click" Width="80" Margin="0,0,10,0"/>
-                <Button Content="Anulează" Click="BtnCancel_Click" Width="80" Background="#EADDF8" Foreground="#4A306D"/>
+                <Button Content="Save" Click="BtnSave_Click" Width="80" Margin="0,0,10,0"/>
+                <Button Content="Cancel" Click="BtnCancel_Click" Width="80" Background="#EADDF8" Foreground="#4A306D"/>
             </StackPanel>
         </Grid>
     </Grid>

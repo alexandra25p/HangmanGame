@@ -57,12 +57,12 @@ namespace HangmanGame.View
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Eroare la încărcarea fișierului: " + ex.Message);
+                    MessageBox.Show("Error loading file: " + ex.Message);
                 }
             }
             else
             {
-                MessageBox.Show("Te rugăm să selectezi o salvare!");
+                MessageBox.Show("Please select a save!");
             }
         }
 

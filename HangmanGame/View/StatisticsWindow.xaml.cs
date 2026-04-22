@@ -100,5 +100,10 @@ namespace HangmanGame.View
         }
 
         private void Close_Click(object sender, RoutedEventArgs e) => this.Close();
+
+        private void StatsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

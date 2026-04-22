@@ -1,11 +1,18 @@
 ﻿<Window x:Class="HangmanGame.View.GameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Hangman - Joc" Height="700" Width="900" 
+        Title="Hangman Game" Height="700" Width="900" 
         WindowStartupLocation="CenterScreen"
         Background="#F4F0FA"
         KeyDown="Window_KeyDown"
         Closed="Window_Closed">
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewGameCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding LoadGameCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveGameCommand}"/>
+        <KeyBinding Key="T" Modifiers="Ctrl" Command="{Binding StatisticsCommand}"/>
+        <KeyBinding Key="I" Modifiers="Ctrl" Command="{Binding AboutCommand}"/>
+    </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -48,16 +55,16 @@
                 </Border>
                 <StackPanel VerticalAlignment="Center" Margin="15,0">
                     <TextBlock Text="{Binding CurrentPlayer.Username}" FontSize="24" FontWeight="Bold" Foreground="#4A306D"/>
-                    <TextBlock Text="{Binding CurrentPlayer.CurrentLevel, StringFormat='Nivel: {0}'}" FontSize="14"  Foreground="Gray" 
+                    <TextBlock Text="{Binding CurrentPlayer.CurrentLevel, StringFormat='Level: {0}'}" FontSize="14"  Foreground="Gray" 
            FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CurrentCategory, StringFormat='Categorie: {0}'}" FontSize="14" Foreground="Gray" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentCategory, StringFormat='Category: {0}'}" FontSize="14" Foreground="Gray" FontWeight="Bold"/>
                 </StackPanel>
             </StackPanel>
 
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
-                <TextBlock Text="Timp rămas: " FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
+                <TextBlock Text="Time Left: " FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
                 <TextBlock Text="{Binding TimeLeft}" FontSize="24" Foreground="Red" FontWeight="Bold"/>
-                <TextBlock Text=" secunde" FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
+                <TextBlock Text=" seconds" FontSize="20" Foreground="#4A306D" FontWeight="Bold"/>
             </StackPanel>
 
             <Button Content="Cancel" Width="100" Height="35" HorizontalAlignment="Right" 

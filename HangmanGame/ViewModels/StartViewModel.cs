@@ -54,8 +54,8 @@ namespace HangmanGame.ViewModels
         {
             if (SelectedUser == null) return;
 
-            var result = MessageBox.Show($"Sigur vrei să ștergi utilizatorul {SelectedUser.Username}? Toate statisticile și jocurile salvate vor fi pierdute.",
-                                         "Confirmare Ștergere", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show($"Are you sure you want to delete user {SelectedUser.Username}? All statistics and saved games will be lost.",
+                                         "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -76,13 +76,13 @@ namespace HangmanGame.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"A apărut o problemă la ștergerea jocurilor salvate: {ex.Message}");
+                    MessageBox.Show($"An error occurred while deleting saved games: {ex.Message}");
                 }
 
                 Users.Remove(SelectedUser);
                 SaveUsers();
 
-                MessageBox.Show("Utilizator șters cu succes!");
+                MessageBox.Show("User deleted successfully!");
             }
         }
 
@@ -175,7 +175,7 @@ namespace HangmanGame.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Eroare critică la încărcarea utilizatorilor: {ex.Message}", "Eroare Fișier");
+                MessageBox.Show($"Critical error loading users: {ex.Message}", "File Error");
             }
         }
     }

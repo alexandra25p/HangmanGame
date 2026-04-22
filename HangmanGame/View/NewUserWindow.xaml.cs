@@ -63,20 +63,20 @@ namespace HangmanGame.View
                 predefinedSelection = Path.GetFileName(fullPath);
 
                 selectedAbsPath = null;
-                TxtPath.Text = "Avatar selectat: " + predefinedSelection;
+                TxtPath.Text = "Selected avatar: " + predefinedSelection;
             }
         }
 
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog { Filter = "Imagini JPG/GIF|*.jpg;*.jpeg;*.gif;*.png" };
+            OpenFileDialog dlg = new OpenFileDialog { Filter = "Images JPG/GIF|*.jpg;*.jpeg;*.gif;*.png" };
             if (dlg.ShowDialog() == true)
             {
                 selectedAbsPath = dlg.FileName;
                 predefinedSelection = null;
                 LstPredefined.SelectedItem = null;
 
-                TxtPath.Text = "Cale externă: " + selectedAbsPath;
+                TxtPath.Text = "External path: " + selectedAbsPath;
             }
         }
 
@@ -86,7 +86,7 @@ namespace HangmanGame.View
 
             if (string.IsNullOrWhiteSpace(username) || username.Contains(" "))
             {
-                MessageBox.Show("Numele trebuie să fie format dintr-un singur cuvânt!"); return;
+                MessageBox.Show("Name must be a single word!"); return;
             }
 
             string relativePathToSave = "";
@@ -106,7 +106,7 @@ namespace HangmanGame.View
             }
             else
             {
-                MessageBox.Show("Te rog să alegi o imagine!"); return;
+                MessageBox.Show("Please select an image!"); return;
             }
 
             CreatedUser = new UserModel { Username = username, ImagePath = relativePathToSave };

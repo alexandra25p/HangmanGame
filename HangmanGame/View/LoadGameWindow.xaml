@@ -1,7 +1,7 @@
 ﻿<Window x:Class="HangmanGame.View.LoadGameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Încarcă Joc" Height="400" Width="400"
+        Title="Load Game" Height="400" Width="400"
         WindowStartupLocation="CenterScreen" Background="#F4F0FA">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -10,7 +10,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Alege o salvare:" FontSize="18" FontWeight="Bold" Foreground="#4A306D" Margin="0,0,0,10"/>
+        <TextBlock Text="Pick a saving:" FontSize="18" FontWeight="Bold" Foreground="#4A306D" Margin="0,0,0,10"/>
 
         <ListBox x:Name="SavesListBox" Grid.Row="1" Background="White" BorderBrush="#D4C4F0" BorderThickness="2">
             <ListBox.ItemTemplate>

@@ -23,7 +23,6 @@ namespace HangmanGame.ViewModels
         private Random _random = new Random();
         private int _mistakes;
         private List<char> _guessedLetters;
-        private int _consecutiveWins = 0;
         private DispatcherTimer _timer;
         private int _timeLeft;
         private string _currentHangmanImage;
@@ -195,7 +194,6 @@ namespace HangmanGame.ViewModels
                 CurrentCategory = category; 
                 IsAllCategories = IsCars = IsMovies = IsRivers = IsCountries = IsFlowers = IsInstruments = false;
                 CurrentPlayer.CurrentLevel = 0;
-                _consecutiveWins = 0;
 
                 switch (category)
                 {
@@ -292,22 +290,15 @@ namespace HangmanGame.ViewModels
             if (!DisplayedWord.Contains('_'))
             {
                 _timer.Stop();
-                _consecutiveWins++; 
-                if (_consecutiveWins >= 3)
-                {
-                    CurrentPlayer.CurrentLevel++;
-                    UpdateUserStatsInFile(true); 
+                CurrentPlayer.CurrentLevel++;
 
-                    _consecutiveWins = 0; 
-                    MessageBox.Show($"FELICITĂRI! Ai ghicit 3 cuvinte la rând. Ai urcat la Nivelul {CurrentPlayer.CurrentLevel}!", "Joc Câștigat");
-                }
-                else
+                if (CurrentPlayer.CurrentLevel >= 3)
                 {
-                  
-                    MessageBox.Show($"Cuvânt ghicit! Seria ta: {_consecutiveWins}/3. Încă puțin!", "Bravo");
+                    UpdateUserStatsInFile(true);
+                    CurrentPlayer.CurrentLevel = 0;
+                    MessageBox.Show($"Congratulation! You guessed 3 words", "Game Won");
                 }
-
-                StartNewGame(null); 
+                StartNewGame(null);
             }
         }
 
@@ -318,15 +309,13 @@ namespace HangmanGame.ViewModels
                 _timer.Stop();
 
                 UpdateUserStatsInFile(false); 
-
-                _consecutiveWins = 0; 
                 CurrentPlayer.CurrentLevel = 0; 
 
                 string revealed = _wordToGuess;
                 _wordToGuess = "";
                 CommandManager.InvalidateRequerySuggested();
 
-                MessageBox.Show($"Ai pierdut! Seria a fost întreruptă. Cuvântul era: {revealed}", "Game Over");
+                MessageBox.Show($"You lost! The series was interrupted. The word was: {revealed}", "Game Over");
                 StartNewGame(null);
             }
         }
@@ -347,12 +336,11 @@ namespace HangmanGame.ViewModels
             {
                 _timer.Stop();
 
-                string cuvantDeAfisat = _wordToGuess;
+                string wordToDisplay = _wordToGuess;
                 UpdateUserStatsInFile(false);
-                _consecutiveWins = 0;
                 CurrentPlayer.CurrentLevel = 0;
 
-                MessageBox.Show($"Timpul a expirat! Joc pierdut. Cuvântul era: {cuvantDeAfisat}", "Game Over");
+                MessageBox.Show($"Time over! The word was : {wordToDisplay}", "Game Over");
 
                 StartNewGame(null);
             }
@@ -368,7 +356,6 @@ namespace HangmanGame.ViewModels
         private void ResetToZeroAndStart(object obj)
         {
             CurrentPlayer.CurrentLevel = 0;
-            _consecutiveWins = 0;
             _usedWords.Clear();
             StartNewGame(null);
         }
@@ -380,7 +367,7 @@ namespace HangmanGame.ViewModels
 
         private void OnSaveGame(object obj)
         {
-            string customName = Microsoft.VisualBasic.Interaction.InputBox("Nume salvare:", "Salvare Joc", $"Salvare_{_currentCategory}");
+            string customName = Microsoft.VisualBasic.Interaction.InputBox("Name", "Save Game", $"Save_{_currentCategory}");
             if (string.IsNullOrEmpty(customName)) return;
 
             try
@@ -400,9 +387,9 @@ namespace HangmanGame.ViewModels
                 string directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
                 if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
                 File.WriteAllText(Path.Combine(directory, $"{save.SaveName}.json"), JsonSerializer.Serialize(save, new JsonSerializerOptions { WriteIndented = true }));
-                MessageBox.Show("Joc salvat!");
+                MessageBox.Show("Game saved!");
             }
-            catch (Exception ex) { MessageBox.Show($"Eroare: {ex.Message}"); }
+            catch (Exception ex) { MessageBox.Show($"Error: {ex.Message}"); }
         }
 
         private void OnLoadGame(object obj)
@@ -425,7 +412,7 @@ namespace HangmanGame.ViewModels
                 UpdateCategoryChecks(_currentCategory);
 
                 _timer.Start();
-                MessageBox.Show("Joc încărcat cu succes!");
+                MessageBox.Show("Game loaded successfully!");
             }
             else
                 _timer.Start();

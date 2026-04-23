@@ -400,7 +400,8 @@ namespace HangmanGame.ViewModels
                     SaveDate = DateTime.Now
                 };
                 string directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Saves");
-                if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
                 File.WriteAllText(Path.Combine(directory, $"{save.SaveName}.json"), JsonSerializer.Serialize(save, new JsonSerializerOptions { WriteIndented = true }));
                 MessageBox.Show("Game saved!");
             }
